@@ -53,7 +53,7 @@
 			addListeners();
 			createAnswer();
 			
-			sorPecas();
+			sortPecas();
 			verificaFinaliza();
 			
 			if (ExternalInterface.available) {
@@ -71,7 +71,7 @@
 		}
 		
 		private var nPecas:int = 15;
-		private function sorPecas():void 
+		private function sortPecas():void 
 		{
 			var posicoesIniciaisFundos:Vector.<Fundo> = new Vector.<Fundo>();
 			var fundo:Fundo;
@@ -87,9 +87,10 @@
 			{
 				child = getChildAt(i);
 				if (child is Peca) {
-					fundo = posicoesIniciaisFundos.pop();
+					fundo = Fundo(posicoesIniciaisFundos.splice(Math.floor(Math.random() * posicoesIniciaisFundos.length), 1)[0]);
 					Peca(child).x = fundo.x;
 					Peca(child).y = fundo.y;
+					//Peca(child).inicialPosition = new Point(child.x, child.y);
 					Peca(child).currentFundo = fundo;
 					fundo.currentPeca = Peca(child);
 					Peca(child).gotoAndStop(2);
@@ -208,6 +209,7 @@
 			
 			removeChild(draggingClassificacao);
 			
+			saveStatus();
 			verificaFinaliza();
 		}
 		
@@ -291,7 +293,7 @@
 					Peca(ghostObj).removeClassificacao();
 					Peca(child).ghost = ghostObj;
 					Peca(child).addListeners();
-					Peca(child).inicialPosition = new Point(child.x, child.y);
+					//Peca(child).inicialPosition = new Point(child.x, child.y);
 					child.addEventListener("paraArraste", verifyPosition);
 					child.addEventListener("iniciaArraste", verifyForFilter);
 					Peca(child).buttonMode = true;
@@ -615,6 +617,7 @@
 		
 		override public function reset(e:MouseEvent = null):void 
 		{
+			/*
 			for (var i:int = 0; i < numChildren; i++)
 			{
 				var child:DisplayObject = getChildAt(i);
@@ -624,11 +627,8 @@
 					Peca(child).currentFundo = null;
 					Peca(child).gotoAndStop(1);
 				}
-				if (child is Fundo) {
-					Fundo(child).currentPeca = null;
-				}
-			}
-			
+			}*/
+			sortPecas();
 			verificaFinaliza();
 			saveStatus();
 		}
