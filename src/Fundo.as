@@ -9,6 +9,7 @@ package
 	public class Fundo extends MovieClip
 	{
 		public var currentPeca:MovieClip;
+		public var figura:MovieClip;
 		
 		public function Fundo() 
 		{

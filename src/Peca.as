@@ -22,6 +22,7 @@ package
 		private var _classificacao:int = 3;
 		private var spr_classificacao:Classificacao;
 		public var ans_classificacao:int;
+		//public var figura:MovieClip;
 		
 		private var _position:Point = new Point();
 		
@@ -51,6 +52,7 @@ package
 		{
 			if (MovieClip(spr_classificacao).hitTestPoint(stage.mouseX, stage.mouseY)) {
 				classificacao += 1;
+				dispatchEvent(new Event("mudaClassificacao", true));
 			}else{
 				dispatchEvent(new Event("iniciaArraste", true));
 				stage.addEventListener(MouseEvent.MOUSE_UP, stopArraste);
@@ -129,7 +131,6 @@ package
 			_classificacao = val;
 			
 			spr_classificacao.gotoAndStop(val);
-			dispatchEvent(new Event("mudaClassificacao", true));
 		}
 		
 	}

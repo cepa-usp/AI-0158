@@ -94,6 +94,7 @@
 					Peca(child).currentFundo = fundo;
 					fundo.currentPeca = Peca(child);
 					Peca(child).gotoAndStop(2);
+					Peca(child).classificacao = 3;
 				}
 			}
 		}
@@ -194,6 +195,9 @@
 					Peca(child).addEventListener(MouseEvent.MOUSE_OVER, overPeca);
 					Peca(child).addEventListener(MouseEvent.MOUSE_OUT, outPeca);
 					Peca(child).addEventListener("mudaClassificacao", mudaClassificacao);
+				}else if (child is Fundo) {
+					var finalFundoName:String = child.name.replace("fundo", "");
+					Fundo(child).figura = this["fig" + finalFundoName];
 				}
 				
 			}
@@ -231,6 +235,12 @@
 					if (Peca(child).classificacao != classificacao) {
 						child.alpha = 0.2;
 						child.filters = [GRAYSCALE_FILTER];
+						
+						Fundo(Peca(child).currentFundo).figura.alpha = 0.2;
+						Fundo(Peca(child).currentFundo).figura.filters = [GRAYSCALE_FILTER];
+						
+						Fundo(Peca(child).currentFundo).alpha = 0.2;
+						Fundo(Peca(child).currentFundo).filters = [GRAYSCALE_FILTER];
 					}
 				}
 			}
@@ -238,6 +248,8 @@
 		
 		private function outPeca(e:MouseEvent):void 
 		{
+			if (!overAlowed) return;
+			
 			var peca:Peca = Peca(e.target);
 			
 			removeFiltersPecas();
@@ -251,6 +263,12 @@
 				if (child is Peca) {
 					child.alpha = 1;
 					child.filters = [];
+					
+					Fundo(Peca(child).currentFundo).figura.alpha = 1;
+					Fundo(Peca(child).currentFundo).figura.filters = [];
+					
+					Fundo(Peca(child).currentFundo).alpha = 1;
+					Fundo(Peca(child).currentFundo).filters = [];
 				}
 			}
 		}
@@ -306,6 +324,7 @@
 		{
 			pecaDragging = Peca(e.target);
 			overAlowed = false;
+			removeFiltersPecas();
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, verifying);
 		}
 		
@@ -446,66 +465,42 @@
 		
 		private function setAnswerForPeca(child:Peca):void 
 		{
+			var finalName:String = getQualifiedClassName(child).replace("Peca", "");
+			
+			child.nome = "peca" + finalName;
+			//child.figura = this["fig" + finalName];
+			child.fundo = [this["fundo" + finalName]];
+			
 			if (child is Peca1) {
-				child.fundo = [fundo1];
-				child.nome = "peca1";
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca2) {
-				child.fundo = [fundo2];
-				child.nome = "peca2";
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca3) {
-				child.fundo = [fundo3];
-				child.nome = "peca3";
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca4) {
-				child.fundo = [fundo4];
-				child.nome = "peca4";
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca5) {
-				child.fundo = [fundo5];
-				child.nome = "peca5";
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca6) {
-				child.fundo = [fundo6];
-				child.nome = "peca6";
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca7) {
-				child.fundo = [fundo7];
-				child.nome = "peca7";
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca8) {
-				child.fundo = [fundo8];
-				child.nome = "peca8";
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca9) {
-				child.fundo = [fundo9];
-				child.nome = "peca9";
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca10) {
-				child.fundo = [fundo10];
-				child.nome = "peca10";
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca11) {
-				child.fundo = [fundo11];
-				child.nome = "peca11";
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca12) {
-				child.fundo = [fundo12];
-				child.nome = "peca12";
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca13) {
-				child.fundo = [fundo13];
-				child.nome = "peca13";
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca14) {
-				child.fundo = [fundo14];
-				child.nome = "peca14";
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca15) {
-				child.fundo = [fundo15];
-				child.nome = "peca15";
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}
 		}
 		
