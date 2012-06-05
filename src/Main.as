@@ -102,116 +102,9 @@
 		{
 			finaliza.addEventListener(MouseEvent.CLICK, finalizaExec);
 			finaliza.buttonMode = true;
-			
-			haploide.buttonMode = true;
-			diploide.buttonMode = true;
-			
-			haploide.mouseChildren = false;
-			diploide.mouseChildren = false;
-			
-			haploide.addEventListener(MouseEvent.MOUSE_DOWN, pegaClassificacao);
-			diploide.addEventListener(MouseEvent.MOUSE_DOWN, pegaClassificacao);
-			
-			haploide.addEventListener(MouseEvent.MOUSE_OVER, overClass);
-			diploide.addEventListener(MouseEvent.MOUSE_OVER, overClass);
-			haploide.addEventListener(MouseEvent.MOUSE_OUT, outClass);
-			diploide.addEventListener(MouseEvent.MOUSE_OUT, outClass);
-		}
-		
-		private function overClass(e:MouseEvent):void 
-		{
-			if (!overAlowed) return;
-			
-			if (e.target.name == "haploide") {
-				diploide.alpha = 0.5;
-				diploide.filters = [GRAYSCALE_FILTER];
-				addFiltersPecas(HAPLOIDE);
-			}else {
-				haploide.alpha = 0.5;
-				haploide.filters = [GRAYSCALE_FILTER];
-				addFiltersPecas(DIPLOIDE);
-			}
-		}
-		
-		private function outClass(e:MouseEvent):void 
-		{
-			diploide.alpha = 1;
-			diploide.filters = [];
-			haploide.alpha = 1;
-			haploide.filters = [];
-			
-			removeFiltersPecas();
 		}
 		
 		private var overAlowed:Boolean = true;
-		private var draggingClassificacao:Classificacao = new Classificacao();
-		private function pegaClassificacao(e:MouseEvent):void 
-		{
-			addChild(draggingClassificacao);
-			overAlowed = false;
-			draggingClassificacao.x = stage.mouseX;
-			draggingClassificacao.y = stage.mouseY;
-			if (e.target.name == "haploide") {
-				draggingClassificacao.gotoAndStop(1);
-			}else {
-				draggingClassificacao.gotoAndStop(2);
-			}
-			
-			draggingClassificacao.startDrag();
-			stage.addEventListener(MouseEvent.MOUSE_MOVE, movingClassificacao);
-			stage.addEventListener(MouseEvent.MOUSE_UP, stopMovingClassificacao);
-		}
-		
-		private function movingClassificacao(e:MouseEvent):void 
-		{
-			var fundoUnder:Fundo = getFundo(new Point(stage.mouseX, stage.mouseY));
-			
-			if (fundoUnder != null) {
-				if (fundoWGlow == null) {
-					fundoWGlow = fundoUnder;
-					fundoWGlow.borda.filters = [fundoFilter];
-				}else {
-					if (fundoWGlow is Fundo) {
-						fundoWGlow.borda.filters = [];
-					}else {
-						fundoWGlow.gotoAndStop(1);
-					}
-					fundoWGlow = fundoUnder;
-					fundoWGlow.borda.filters = [fundoFilter];
-				}
-			}else {
-				if (fundoWGlow != null) {
-					if(fundoWGlow is Fundo){
-						Fundo(fundoWGlow).borda.filters = [];
-					}else {
-						fundoWGlow.gotoAndStop(1);
-					}
-					fundoWGlow = null;
-				}
-			}
-		}
-		
-		private function stopMovingClassificacao(e:MouseEvent):void 
-		{
-			stage.removeEventListener(MouseEvent.MOUSE_MOVE, movingClassificacao);
-			stage.removeEventListener(MouseEvent.MOUSE_UP, stopMovingClassificacao);
-			draggingClassificacao.stopDrag();
-			overAlowed = true;
-			
-			if (fundoWGlow != null) {
-				
-				Peca(Fundo(fundoWGlow).currentPeca).classificacao = draggingClassificacao.currentFrame;
-				
-				if (fundoWGlow is Fundo) fundoWGlow.borda.filters = [];
-				else fundoWGlow.gotoAndStop(1);
-				fundoWGlow = null;
-			}
-			
-			removeChild(draggingClassificacao);
-			
-			saveStatus();
-			verificaFinaliza();
-		}
 		
 		private function finalizaExec(e:MouseEvent):void 
 		{
@@ -300,9 +193,20 @@
 					Peca(child).gotoAndStop(1);
 					Peca(child).addEventListener(MouseEvent.MOUSE_OVER, overPeca);
 					Peca(child).addEventListener(MouseEvent.MOUSE_OUT, outPeca);
+					Peca(child).addEventListener("mudaClassificacao", mudaClassificacao);
 				}
 				
 			}
+		}
+		
+		private function mudaClassificacao(e:Event):void 
+		{
+			var peca:Peca = Peca(e.target);
+			
+			addFiltersPecas(peca.classificacao);
+			
+			saveStatus();
+			verificaFinaliza();
 		}
 		
 		private function overPeca(e:MouseEvent):void 
@@ -310,20 +214,16 @@
 			if (!overAlowed) return;
 			
 			var peca:Peca = Peca(e.target);
-			if (peca.classificacao == 3) return;
 			
-			if (peca.classificacao == HAPLOIDE) {
-				diploide.alpha = 0.5;
-				diploide.filters = [GRAYSCALE_FILTER];
-			}else {
-				haploide.alpha = 0.5;
-				haploide.filters = [GRAYSCALE_FILTER];
-			}
 			addFiltersPecas(peca.classificacao);
 		}
 		
 		private function addFiltersPecas(classificacao:int):void 
 		{
+			removeFiltersPecas();
+			
+			if (classificacao == 3) return;
+				
 			for (var i:int = 0; i < numChildren; i++) 
 			{
 				var child:DisplayObject = getChildAt(i);
@@ -339,12 +239,6 @@
 		private function outPeca(e:MouseEvent):void 
 		{
 			var peca:Peca = Peca(e.target);
-			if (peca.classificacao == 3) return;
-			
-			haploide.alpha = 1;
-			haploide.filters = [];
-			diploide.alpha = 1;
-			diploide.filters = [];
 			
 			removeFiltersPecas();
 		}

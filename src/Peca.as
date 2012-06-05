@@ -34,6 +34,7 @@ package
 			spr_classificacao.x = 55;
 			spr_classificacao.y = -35 / 2;
 			spr_classificacao.gotoAndStop(_classificacao);
+			spr_classificacao.mouseEnabled = false;
 		}
 		
 		public function removeClassificacao():void
@@ -48,17 +49,21 @@ package
 		
 		private function initArraste(e:MouseEvent):void 
 		{
-			dispatchEvent(new Event("iniciaArraste", true));
-			stage.addEventListener(MouseEvent.MOUSE_UP, stopArraste);
-			this.parent.addChild(ghost);
-			ghost.x = this.x;
-			ghost.y = this.y;
-			this.parent.setChildIndex(ghost, this.parent.numChildren - 1);
-			if (withMouseMove) {
-				posClick = new Point(ghost.mouseX, ghost.mouseY);
-				stage.addEventListener(MouseEvent.MOUSE_MOVE, moving);
+			if (MovieClip(spr_classificacao).hitTestPoint(stage.mouseX, stage.mouseY)) {
+				classificacao += 1;
+			}else{
+				dispatchEvent(new Event("iniciaArraste", true));
+				stage.addEventListener(MouseEvent.MOUSE_UP, stopArraste);
+				this.parent.addChild(ghost);
+				ghost.x = this.x;
+				ghost.y = this.y;
+				this.parent.setChildIndex(ghost, this.parent.numChildren - 1);
+				if (withMouseMove) {
+					posClick = new Point(ghost.mouseX, ghost.mouseY);
+					stage.addEventListener(MouseEvent.MOUSE_MOVE, moving);
+				}
+				else ghost.startDrag();
 			}
-			else ghost.startDrag();
 		}
 		
 		private function moving(e:MouseEvent):void 
@@ -119,9 +124,12 @@ package
 		
 		public function set classificacao(value:int):void 
 		{
-			_classificacao = value;
+			var val:int = value;
+			if (val > 3) val = 1;
+			_classificacao = val;
 			
-			spr_classificacao.gotoAndStop(value);
+			spr_classificacao.gotoAndStop(val);
+			dispatchEvent(new Event("mudaClassificacao", true));
 		}
 		
 	}
