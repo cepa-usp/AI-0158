@@ -112,7 +112,8 @@
 		}
 		
 		private var overAlowed:Boolean = true;
-		private var wrongFilter:GlowFilter = new GlowFilter(0x800000, 1, 10, 10, 3, 2);
+		private var wrongFilter:GlowFilter = new GlowFilter(0xFF0000, 0.8, 6, 6, 3, 2);
+		private var rightFilter:GlowFilter = new GlowFilter(0x008000, 0.8, 6, 6, 3, 2);
 		
 		private function finalizaExec(e:MouseEvent):void 
 		{
@@ -128,6 +129,7 @@
 					//Posicao
 					if(Peca(child).fundo.indexOf(Peca(child).currentFundo) != -1){
 						nCertasPos++;
+						Peca(child).pecaErrada = [rightFilter];
 					}else {
 						Peca(child).pecaErrada = [wrongFilter];
 					}
@@ -135,6 +137,7 @@
 					//Classificacao:
 					if(Peca(child).classificacao == Peca(child).ans_classificacao){
 						nCertasClass++;
+						Peca(child).classificacaoErrada = [rightFilter];
 					}else {
 						Peca(child).classificacaoErrada = [wrongFilter];
 					}
@@ -228,9 +231,16 @@
 		
 		private function mudaClassificacao(e:Event):void 
 		{
+			removeFiltersPecas();
 			var peca:Peca = Peca(e.target);
+			classificacaoOver = peca.classificacao;
 			
-			addFiltersPecas(peca.classificacao);
+			if (timerFilterPecas.running) {
+				timerFilterPecas.stop();
+				timerFilterPecas.reset();
+			}
+			timerFilterPecas.start();
+			//addFiltersPecas(peca.classificacao);
 			
 			saveStatus();
 			verificaFinaliza();
