@@ -112,10 +112,12 @@
 		}
 		
 		private var overAlowed:Boolean = true;
+		private var wrongFilter:GlowFilter = new GlowFilter(0x800000, 1, 10, 10, 3, 2);
 		
 		private function finalizaExec(e:MouseEvent):void 
 		{
-			var nCertas:int = 0;
+			var nCertasPos:int = 0;
+			var nCertasClass:int = 0;
 			var nPecas:int = 0;
 			
 			for (var i:int = 0; i < numChildren; i++) 
@@ -123,32 +125,45 @@
 				var child:DisplayObject = getChildAt(i);
 				if (child is Peca) {
 					nPecas++;
+					//Posicao
 					if(Peca(child).fundo.indexOf(Peca(child).currentFundo) != -1){
-						nCertas++;
-						trace(Peca(child).nome);
+						nCertasPos++;
+					}else {
+						Peca(child).pecaErrada = [wrongFilter];
+					}
+					
+					//Classificacao:
+					if(Peca(child).classificacao == Peca(child).ans_classificacao){
+						nCertasClass++;
+					}else {
+						Peca(child).classificacaoErrada = [wrongFilter];
 					}
 				}
 			}
 			
-			var currentScore:Number = int((nCertas / nPecas) * 100);
+			var currentScore:int = int((nCertasPos / nPecas) * 50);
+			currentScore += int((nCertasClass / nPecas) * 50);
 			
-			if (currentScore < 100) {
-				feedbackScreen.setText("Ops!... \nReveja sua resposta.\nInicie uma nova tentativa para refazer o exercício.");
-			}
-			else {
-				feedbackScreen.setText("Parabéns!\nSua resposta está correta!");
-			}
+			if(e != null){
+				if (currentScore < 100) {
+					feedbackScreen.setText("Sua pontuação foi de " + currentScore + "%. As respostas erradas estão destacadas em vermelho.");
+				}
+				else {
+					feedbackScreen.setText("Parabéns!\nSua resposta está correta!");
+				}
 			
-			if (!completed) {
-				completed = true;
-				score = currentScore;
-				saveStatus();
-				commit();
+			
+				if (!completed) {
+					completed = true;
+					score = currentScore;
+					saveStatus();
+					commit();
+					
+					travaPecas();
+				}
 				
-				travaPecas();
+				setChildIndex(feedbackScreen, numChildren - 1);
 			}
-			
-			setChildIndex(feedbackScreen, numChildren - 1);
 		}
 		
 		private function travaPecas():void 
@@ -157,7 +172,8 @@
 			{
 				var child:DisplayObject = getChildAt(i);
 				if (child is Peca) {
-					Peca(child).mouseEnabled = false;
+					//Peca(child).mouseEnabled = false;
+					Peca(child).removeListeners();
 				}
 			}
 			
@@ -204,6 +220,7 @@
 				}else if (child is Fundo) {
 					var finalFundoName:String = child.name.replace("fundo", "");
 					Fundo(child).figura = this["fig" + finalFundoName];
+					Fundo(child).linha = this["linha" + finalFundoName];
 				}
 				
 			}
@@ -265,6 +282,7 @@
 						
 						Actuate.tween(child, alphaTweenTime, { alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, child);
 						Actuate.tween(Fundo(Peca(child).currentFundo).figura, alphaTweenTime, {alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, Fundo(Peca(child).currentFundo).figura);
+						Actuate.tween(Fundo(Peca(child).currentFundo).linha, alphaTweenTime, {alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, Fundo(Peca(child).currentFundo).linha);
 						Actuate.tween(Fundo(Peca(child).currentFundo), alphaTweenTime, {alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, Fundo(Peca(child).currentFundo));
 					}
 				}
@@ -275,7 +293,7 @@
 				Actuate.tween(this["non" + j], alphaTweenTime, { alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, this["non" + j]);
 			}
 			
-			timerForScale.start();
+			//timerForScale.start();
 			
 		}
 		
@@ -322,6 +340,10 @@
 				timerForScale.stop();
 				timerForScale.reset();
 			}
+			if (timerFilterPecas.running) {
+				timerFilterPecas.stop();
+				timerFilterPecas.reset();
+			}
 			
 			for (var i:int = 0; i < numChildren; i++) 
 			{
@@ -330,6 +352,7 @@
 					
 					Actuate.stop(child, null, true );
 					Actuate.stop(Fundo(Peca(child).currentFundo).figura, null );
+					Actuate.stop(Fundo(Peca(child).currentFundo).linha, null );
 					Actuate.stop(Fundo(Peca(child).currentFundo), null);
 					
 					Actuate.stop(Fundo(Peca(child).currentFundo).figura, null);
@@ -338,7 +361,9 @@
 					child.filters = [];
 					
 					Fundo(Peca(child).currentFundo).figura.alpha = 1;
+					Fundo(Peca(child).currentFundo).linha.alpha = 1;
 					Fundo(Peca(child).currentFundo).figura.filters = [];
+					Fundo(Peca(child).currentFundo).linha.filters = [];
 					Fundo(Peca(child).currentFundo).figura.scaleX = Fundo(Peca(child).currentFundo).figura.scaleY = 1;
 					
 					Fundo(Peca(child).currentFundo).alpha = 1;
@@ -397,6 +422,7 @@
 				}
 			}
 			
+			if (completed) finalizaExec(null);
 		}
 		
 		private var pecaDragging:Peca;
@@ -557,21 +583,21 @@
 			if (child is Peca1) {
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca2) {
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca3) {
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca4) {
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca5) {
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca6) {
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca7) {
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca8) {
-				child.ans_classificacao = DIPLOIDE;
+				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca9) {
-				child.ans_classificacao = DIPLOIDE;
+				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca10) {
 				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca11) {
@@ -579,7 +605,7 @@
 			}else if (child is Peca12) {
 				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca13) {
-				child.ans_classificacao = DIPLOIDE;
+				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca14) {
 				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca15) {
@@ -756,6 +782,11 @@
 
 				// Notifica o LMS que esta atividade foi concluída.
 				success = scorm.set("cmi.completion_status", (completed ? "completed" : "incomplete"));
+				
+				//success = scorm.set("cmi.exit", (completed ? "normal" : "suspend"));
+				
+				//Notifica o LMS se o aluno passou ou falhou na atividade, de acordo com a pontuação:
+				success = scorm.set("cmi.success_status", (score > 75 ? "passed" : "failed"));
 
 				// Salva no LMS o exercício que deve ser exibido quando a AI for acessada novamente.
 				success = scorm.set("cmi.location", scormExercise.toString());

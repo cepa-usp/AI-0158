@@ -52,6 +52,7 @@
   <libraryPaths>
     <element path="src\BaseAssets\BaseAssets.swc" />
     <element path="src\as3corelib.swc" />
+    <element path="src\BaseAssets\as3corelib.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

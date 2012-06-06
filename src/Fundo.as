@@ -10,6 +10,7 @@ package
 	{
 		public var currentPeca:MovieClip;
 		public var figura:MovieClip;
+		public var linha:MovieClip;
 		
 		public function Fundo() 
 		{

@@ -36,6 +36,8 @@ package
 			spr_classificacao.y = -35 / 2;
 			spr_classificacao.gotoAndStop(_classificacao);
 			spr_classificacao.mouseEnabled = false;
+			
+			this.fundoBranco.visible = false;
 		}
 		
 		public function removeClassificacao():void
@@ -46,6 +48,11 @@ package
 		public function addListeners():void
 		{
 			addEventListener(MouseEvent.MOUSE_DOWN, initArraste);
+		}
+		
+		public function removeListeners():void
+		{
+			removeEventListener(MouseEvent.MOUSE_DOWN, initArraste);
 		}
 		
 		private function initArraste(e:MouseEvent):void 
@@ -131,6 +138,17 @@ package
 			_classificacao = val;
 			
 			spr_classificacao.gotoAndStop(val);
+		}
+		
+		public function set pecaErrada(value:Array):void 
+		{
+			this.fundoBranco.visible = true;
+			this.fundoBranco.filters = value;
+		}
+		
+		public function set classificacaoErrada(value:Array):void
+		{
+			MovieClip(spr_classificacao).filters = value;
 		}
 		
 	}
