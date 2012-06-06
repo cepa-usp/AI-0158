@@ -648,10 +648,9 @@
 		private var pointsTuto:Array;
 		private var tutoBaloonPos:Array;
 		private var tutoPos:int;
-		private var tutoSequence:Array = ["Arraste os conceitos...", 
-										  "... para as caixas corretas...",
-										  "... conforme descrito nas orientações.",
-										  "Quando você tiver concluído, pressione \"terminei\"."];
+		private var tutoSequence:Array = ["Organize as peças (arraste-as) de acordo com o esquema.", 
+										  "Clique para classificar como haploide (n) ou diploide (2n).",
+										  "Clique para avaliar sua resposta."];
 		
 		override public function iniciaTutorial(e:MouseEvent = null):void
 		{
@@ -661,15 +660,13 @@
 				addChild(balao);
 				balao.visible = false;
 				
-				pointsTuto = 	[new Point(405, 460),
-								new Point(348 , 180),
-								new Point(650 , 543),
-								new Point(finaliza.x, finaliza.y + finaliza.height / 2)];
+				pointsTuto = 	[new Point(327, 318),
+								new Point(383 , 278),
+								new Point(55 , 612)];
 								
-				tutoBaloonPos = [[CaixaTexto.BOTTON, CaixaTexto.CENTER],
-								[CaixaTexto.TOP, CaixaTexto.CENTER],
-								[CaixaTexto.RIGHT, CaixaTexto.FIRST],
-								[CaixaTexto.TOP, CaixaTexto.FIRST]];
+				tutoBaloonPos = [[CaixaTexto.TOP, CaixaTexto.CENTER],
+								[CaixaTexto.BOTTON, CaixaTexto.CENTER],
+								[CaixaTexto.BOTTON, CaixaTexto.FIRST]];
 			}
 			balao.removeEventListener(Event.CLOSE, closeBalao);
 			
