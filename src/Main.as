@@ -3,6 +3,8 @@
 	import BaseAssets.BaseMain;
 	import com.adobe.serialization.json.JSON;
 	import cepa.utils.ToolTip;
+	import com.eclecticdesignstudio.motion.Actuate;
+	import com.eclecticdesignstudio.motion.easing.Linear;
 	import fl.transitions.easing.None;
 	import fl.transitions.Tween;
 	import flash.display.DisplayObject;
@@ -37,6 +39,7 @@
 		private var tweenY2:Tween;
 		
 		private var tweenTime:Number = 0.2;
+		private var timerFilterPecas:Timer = new Timer(400, 1);
 		
 		public function Main() 
 		{
@@ -103,6 +106,7 @@
 		{
 			finaliza.addEventListener(MouseEvent.CLICK, finalizaExec);
 			finaliza.buttonMode = true;
+			timerFilterPecas.addEventListener(TimerEvent.TIMER_COMPLETE, timerCompleted);
 		}
 		
 		private var overAlowed:Boolean = true;
@@ -213,15 +217,27 @@
 			verificaFinaliza();
 		}
 		
+		private var classificacaoOver:int;
 		private function overPeca(e:MouseEvent):void 
 		{
 			if (!overAlowed) return;
 			
-			var peca:Peca = Peca(e.target);
+			timerFilterPecas.start();
 			
-			addFiltersPecas(peca.classificacao);
+			
+			var peca:Peca = Peca(e.target);
+			classificacaoOver = peca.classificacao;
+			//addFiltersPecas(peca.classificacao);
+			
 		}
 		
+		private function timerCompleted(e:TimerEvent):void 
+		{
+			addFiltersPecas(classificacaoOver);
+		}
+		
+		private var alphaTweenTime:Number = 0.6;
+		private var nonN:int = 11;
 		private function addFiltersPecas(classificacao:int):void 
 		{
 			removeFiltersPecas();
@@ -233,6 +249,7 @@
 				var child:DisplayObject = getChildAt(i);
 				if (child is Peca) {
 					if (Peca(child).classificacao != classificacao) {
+						/*
 						child.alpha = 0.2;
 						child.filters = [GRAYSCALE_FILTER];
 						
@@ -241,15 +258,35 @@
 						
 						Fundo(Peca(child).currentFundo).alpha = 0.2;
 						Fundo(Peca(child).currentFundo).filters = [GRAYSCALE_FILTER];
+						*/
+						
+						Actuate.tween(child, alphaTweenTime, { alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, child);
+						Actuate.tween(Fundo(Peca(child).currentFundo).figura, alphaTweenTime, {alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, Fundo(Peca(child).currentFundo).figura);
+						Actuate.tween(Fundo(Peca(child).currentFundo), alphaTweenTime, {alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, Fundo(Peca(child).currentFundo));
 					}
 				}
 			}
+			
+			for (var j:int = 1; j <= nonN ; j++) 
+			{
+				Actuate.tween(this["non" + j], alphaTweenTime, { alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, this["non" + j]);
+			}
+		}
+		
+		private function setFilter(obj:*):void 
+		{
+			obj.filters = [GRAYSCALE_FILTER];
 		}
 		
 		private function outPeca(e:MouseEvent):void 
 		{
 			if (!overAlowed) return;
 			
+			if (timerFilterPecas.running) {
+				timerFilterPecas.stop();
+				timerFilterPecas.reset();
+				return;
+			}
 			var peca:Peca = Peca(e.target);
 			
 			removeFiltersPecas();
@@ -270,6 +307,12 @@
 					Fundo(Peca(child).currentFundo).alpha = 1;
 					Fundo(Peca(child).currentFundo).filters = [];
 				}
+			}
+			
+			for (var j:int = 1; j <= nonN ; j++) 
+			{
+				this["non" + j].alpha = 1;
+				this["non" + j].filters = [];
 			}
 		}
 		
