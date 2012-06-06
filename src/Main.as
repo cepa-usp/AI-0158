@@ -4,6 +4,7 @@
 	import com.adobe.serialization.json.JSON;
 	import cepa.utils.ToolTip;
 	import com.eclecticdesignstudio.motion.Actuate;
+	import com.eclecticdesignstudio.motion.easing.Elastic;
 	import com.eclecticdesignstudio.motion.easing.Linear;
 	import fl.transitions.easing.None;
 	import fl.transitions.Tween;
@@ -107,6 +108,7 @@
 			finaliza.addEventListener(MouseEvent.CLICK, finalizaExec);
 			finaliza.buttonMode = true;
 			timerFilterPecas.addEventListener(TimerEvent.TIMER_COMPLETE, timerCompleted);
+			timerForScale.addEventListener(TimerEvent.TIMER_COMPLETE, sclaeObjs);
 		}
 		
 		private var overAlowed:Boolean = true;
@@ -238,6 +240,7 @@
 		
 		private var alphaTweenTime:Number = 0.6;
 		private var nonN:int = 11;
+		private var timerForScale:Timer = new Timer(650, 1);
 		private function addFiltersPecas(classificacao:int):void 
 		{
 			removeFiltersPecas();
@@ -271,11 +274,32 @@
 			{
 				Actuate.tween(this["non" + j], alphaTweenTime, { alpha:0.2 } ).ease(Linear.easeNone).onComplete(setFilter, this["non" + j]);
 			}
+			
+			timerForScale.start();
+			
 		}
 		
 		private function setFilter(obj:*):void 
 		{
 			obj.filters = [GRAYSCALE_FILTER];
+		}
+		
+		private function removeFilter(obj:*):void 
+		{
+			obj.filters = [];
+		}
+		
+		private function sclaeObjs(e:TimerEvent):void 
+		{
+			for (var i:int = 0; i < numChildren; i++) 
+			{
+				var child:DisplayObject = getChildAt(i);
+				if (child is Peca) {
+					if (Peca(child).alpha == 1) {
+						Actuate.tween(Fundo(Peca(child).currentFundo).figura, 0.3, {scaleX:3, scaleY:3 } ).ease(Elastic.easeOut);
+					}
+				}
+			}
 		}
 		
 		private function outPeca(e:MouseEvent):void 
@@ -294,23 +318,39 @@
 		
 		private function removeFiltersPecas():void 
 		{
+			if (timerForScale.running) {
+				timerForScale.stop();
+				timerForScale.reset();
+			}
+			
 			for (var i:int = 0; i < numChildren; i++) 
 			{
 				var child:DisplayObject = getChildAt(i);
 				if (child is Peca) {
+					
+					Actuate.stop(child, null, true );
+					Actuate.stop(Fundo(Peca(child).currentFundo).figura, null );
+					Actuate.stop(Fundo(Peca(child).currentFundo), null);
+					
+					Actuate.stop(Fundo(Peca(child).currentFundo).figura, null);
+					
 					child.alpha = 1;
 					child.filters = [];
 					
 					Fundo(Peca(child).currentFundo).figura.alpha = 1;
 					Fundo(Peca(child).currentFundo).figura.filters = [];
+					Fundo(Peca(child).currentFundo).figura.scaleX = Fundo(Peca(child).currentFundo).figura.scaleY = 1;
 					
 					Fundo(Peca(child).currentFundo).alpha = 1;
 					Fundo(Peca(child).currentFundo).filters = [];
+					
+					
 				}
 			}
 			
 			for (var j:int = 1; j <= nonN ; j++) 
 			{
+				Actuate.stop(this["non" + j], null);
 				this["non" + j].alpha = 1;
 				this["non" + j].filters = [];
 			}
