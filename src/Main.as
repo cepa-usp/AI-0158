@@ -591,7 +591,7 @@
 			child.fundo = [this["fundo" + finalName]];
 			
 			if (child is Peca1) {
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca2) {
 				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca3) {
@@ -599,7 +599,7 @@
 			}else if (child is Peca4) {
 				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca5) {
-				child.ans_classificacao = DIPLOIDE;
+				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca6) {
 				child.ans_classificacao = HAPLOIDE;
 			}else if (child is Peca7) {
@@ -615,7 +615,7 @@
 			}else if (child is Peca12) {
 				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca13) {
-				child.ans_classificacao = HAPLOIDE;
+				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca14) {
 				child.ans_classificacao = DIPLOIDE;
 			}else if (child is Peca15) {
