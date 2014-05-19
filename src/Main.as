@@ -802,6 +802,12 @@
 				//mementoSerialized = marshalObjects();
 				success = scorm.set("cmi.suspend_data", mementoSerialized.toString());
 
+				if(completed){
+			  		scorm.set("cmi.exit", "normal");
+				} else {
+			  		scorm.set("cmi.exit", "suspend");
+				}
+
 				if (success)
 				{
 					scorm.save();
